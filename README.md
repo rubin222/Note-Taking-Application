@@ -59,7 +59,7 @@ php artisan migrate
 
 ### 8. Start Development Server
 php artisan serve
-Now open your browser at http://127.0.0.1:8000
+Now open your browser at http://127.0.0.1:8000/auth/register
 
 
 
