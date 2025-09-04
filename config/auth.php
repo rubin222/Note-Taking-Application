@@ -19,7 +19,7 @@ return [
 //defines API guard, uses JWT tokens instead of session for API requests
 //uses same users providers
         'api' => [
-            'driver' => 'jwt',
+            'driver' => 'jwt', //token
             'provider' => 'users',
         ],
     ],
@@ -41,5 +41,5 @@ return [
         ],
     ],
 
-    'password_timeout' => 10800,
+    'password_timeout' => 10800,                        //timeout for password 
 ];

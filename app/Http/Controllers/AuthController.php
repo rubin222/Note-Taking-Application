@@ -179,6 +179,47 @@ public function webRegister(Request $request)
         return redirect()->route('dashboard') //redirect to dashboard with success
             ->with('success', 'Category created successfully.');
     }
+    public function login(Request $request)
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|min:6',
+    ]);
+
+    if (!$token = auth()->attempt($request->only('email', 'password'))) {
+        return response()->json(['error' => 'Invalid credentials'], 401);
+    }
+
+    return response()->json([
+        'message' => 'Login successful',
+        'token' => $token,
+    ]);
+}
+public function register(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:6|confirmed',
+    ]);
+
+    $user = User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+    ]);
+
+    // Generate JWT token
+    $token = JWTAuth::fromUser($user);
+
+    return response()->json([
+        'message' => 'Registration successful',
+        'user' => $user,
+        'token' => $token
+    ]);
+}
+
+
 }
 
 
