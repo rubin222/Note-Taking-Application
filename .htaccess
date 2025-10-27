@@ -1,8 +1,6 @@
-# ------------------------------------------------------------------
-# Note-Taking App - Render-optimized .htaccess
-# ------------------------------------------------------------------
+# Render-optimized .htaccess
 
-# Allow Apache to serve all files
+# Allow access to all files
 <IfModule mod_authz_core.c>
     Require all granted
 </IfModule>
@@ -21,13 +19,13 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send all other requests to front controller (index.php)
+    # Send all other requests to index.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# Optional: Block sensitive files
+# Block sensitive files
 <FilesMatch "\.(env|ini|log|sh|bak)$">
     Require all denied
 </FilesMatch>
