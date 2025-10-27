@@ -1,25 +1,33 @@
-<IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+# ------------------------------------------------------------------
+# Note-Taking App - Render-optimized .htaccess
+# ------------------------------------------------------------------
 
+# Allow Apache to serve all files
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# Disable directory listing and multi-views
+<IfModule mod_negotiation.c>
+    Options -Indexes -MultiViews
+</IfModule>
+
+# Enable URL rewriting
+<IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Handle Authorization Header
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
-
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect trailing slashes if not a directory
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # Send all other requests to front controller (index.php)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Optional: Block sensitive files
+<FilesMatch "\.(env|ini|log|sh|bak)$">
+    Require all denied
+</FilesMatch>
