@@ -1,26 +1,28 @@
-# Use official PHP 8.2 with Apache
 FROM php:8.2-apache
 
-# Install necessary PHP extensions for Laravel
+# Install required extensions
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Enable Apache rewrite module for Laravel routing
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /var/www/html
 
-# Copy all project files into the container
+# Copy all files
 COPY . /var/www/html
 
-# Update Apache configuration to use the Laravel public folder
+# Update Apache config to point to Laravel's public folder
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
-# Change Apache to listen on Render’s dynamic port
-RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf
+# Add Directory configuration to allow .htaccess overrides
+RUN echo '<Directory /var/www/html/public>\n\
+    AllowOverride All\n\
+    Require all granted\n\
+</Directory>' >> /etc/apache2/apache2.conf
 
-# Expose Render port
-EXPOSE 10000
+# Replace port 80 with Render's dynamic port
+RUN sed -i "s/80/\${PORT}/g" /etc/apache2/sites-available/000-default.conf
 
-# Start Apache
+EXPOSE 80
 CMD ["apache2-foreground"]
