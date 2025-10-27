@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------
+# Note-Taking App - Render-optimized .htaccess
+# ------------------------------------------------------------------
+
+# Allow Apache to serve all files
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# Disable directory listing and multi-views
+<IfModule mod_negotiation.c>
+    Options -Indexes -MultiViews
+</IfModule>
+
+# Enable URL rewriting
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect trailing slashes if not a directory
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send all other requests to front controller (index.php)
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Optional: Block sensitive files
+<FilesMatch "\.(env|ini|log|sh|bak)$">
+    Require all denied
+</FilesMatch>
