@@ -1,28 +1,34 @@
+# Use the official PHP 8.2 image with Apache
 FROM php:8.2-apache
 
-# Install required extensions
-RUN docker-php-ext-install pdo pdo_mysql
-
-# Enable Apache mod_rewrite
+# Enable Apache mod_rewrite for Laravel
 RUN a2enmod rewrite
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all files
-COPY . /var/www/html
+# Install required PHP extensions for Laravel
+RUN apt-get update && apt-get install -y \
+    libzip-dev unzip git curl && \
+    docker-php-ext-install pdo pdo_mysql zip
 
-# Update Apache config to point to Laravel's public folder
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Add Directory configuration to allow .htaccess overrides
-RUN echo '<Directory /var/www/html/public>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' >> /etc/apache2/apache2.conf
+# Copy project files to container
+COPY . .
 
-# Replace port 80 with Render's dynamic port
-RUN sed -i "s/80/\${PORT}/g" /etc/apache2/sites-available/000-default.conf
+# Install dependencies
+RUN composer install --no-dev --optimize-autoloader
 
+# Set correct permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Copy your .env file (Render will override with environment variables)
+COPY .env .env
+
+# Expose port 80 for web traffic
 EXPOSE 80
+
+# Start Apache
 CMD ["apache2-foreground"]
