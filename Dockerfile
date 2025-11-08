@@ -10,7 +10,7 @@ WORKDIR /var/www/html
 # Install required PHP extensions for Laravel
 RUN apt-get update && apt-get install -y \
     libzip-dev unzip git curl && \
-    docker-php-ext-install pdo pdo_mysql zip
+    docker-php-ext-install pdo pdo_sqlite zip
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -23,9 +23,6 @@ RUN composer install --no-dev --optimize-autoloader
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Copy your .env file (Render will override with environment variables)
-COPY .env .env
 
 # Expose port 80 for web traffic
 EXPOSE 80
